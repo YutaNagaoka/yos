@@ -4,30 +4,23 @@
 #![test_runner(yos::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-mod serial;
-mod vga_buffer;
-
 use core::panic::PanicInfo;
+use yos::{println, serial_print, serial_println};
 
 #[no_mangle]
-pub extern "C" fn _start() {
-    println!("Hello World!");
-
-    #[cfg(test)]
+pub extern "C" fn _start() -> ! {
     test_main();
-
     loop {}
 }
 
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    println!("{}", info);
-    loop {}
-}
-
-#[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     yos::test_panic_handler(info)
+}
+
+#[test_case]
+fn test_println() {
+    serial_print!("test_println... ");
+    println!("test_println_output");
+    serial_println!("[ok]");
 }
